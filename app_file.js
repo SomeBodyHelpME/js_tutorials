@@ -8,17 +8,57 @@ app.set('views', './views_file');
 app.set('view engine', 'jade');
 
 app.get('/topic/new', function(req, res) {
-  res.render('new');
+  fs.readdir('data', function(err, files) {
+    if(err) {
+      console.log(err);
+      res.status(500).send('Internal Server Error');
+    }
+    res.render('new', {topics:files});
+  });//fs.readdir
 });
 
-app.post('topic', function(req, res) {
+// app.get(['/topic', '/topic/:id'], function(req, res) {
+//   fs.readdir('data', function(err, files) {
+//     if(err) {
+//       console.log(err);
+//       res.status(500).send('Internal Server Error');
+//     }
+//     res.render('view', {topics:files});
+//   })
+// });
+
+app.get(['/topic', '/topic/:id'], function(req, res) {
+  var id = req.params.id;
+  fs.readdir('data', function(err, files) {
+    if(err) {
+      console.log(err);
+      res.status(500).send('Internal Server Error');
+    }
+    var id = req.params.id;
+    if(id) {
+      //id값이 있을 때
+      fs.readFile('data/' + id, 'utf8', function(err, data) {
+        if(err) {
+          console.log(err);
+          res.status(500).send('Internal Server Error');
+        }
+        res.render('view', {topics:files, title:id, description:data})
+      }); //fs.readFile
+    } else {
+      //id값이 없을 때
+      res.render('view', {topics:files, title:'Welcome', description:'Hello, Javascript for server.'});
+    }//else
+  });//fs.readdir
+});
+
+app.post('/topic', function(req, res) {
   var title = req.body.title;
   var description = req.body.description;
   fs.writeFile('data/' + title, description, function(err) {
     if(err) {
       res.status(500).send('Internal Server Error');
     }
-    res.send('Success');
+    res.redirect('/topic/' + title);
   });
 });
 
