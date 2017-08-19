@@ -1,7 +1,7 @@
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var app = express();
-app.use(cookieParser());
+app.use(cookieParser('12QWE!@%@!^ewqc7251'));
 var products = {
   1:{title:'The history of web 1'},
   2:{title:'The next web'}
@@ -18,7 +18,7 @@ app.get('/products', function(req, res){
 });
 app.get('/cart/:id', function(req, res){
   var id = req.params.id;
-  if(req.cookies.cart) {
+  if(req.signedCookies.cart) {
     var cart = req.cookies.cart;
   } else {
     var cart = {};
@@ -27,13 +27,13 @@ app.get('/cart/:id', function(req, res){
     cart[id] = 0;
   }
   cart[id] = parseInt(cart[id])+1;
-  res.cookie('cart', cart);
+  res.cookie('cart', cart, {signed:true});
   res.redirect('/cart');
 });
 app.get('/cart', function(req, res){
   var cart = req.cookies.cart;
   if(!cart) {
-    res.rend('Empty!');
+    res.send('Empty!');
   } else {
     var output = '';
     for(var id in cart){
@@ -48,13 +48,13 @@ app.get('/cart', function(req, res){
 });
 
 app.get('/count', function(req, res){
-  if(req.cookies.count){
+  if(req.signedCookies.count){
     var count = parseInt(req.cookies.count);
   } else {
     var count = 0;
   }
   count = count+1;
-  res.cookie('count', count);
+  res.cookie('count', count, {signed:true});
   res.send('count : ' + count);
 });
 app.listen(3003, function(){
