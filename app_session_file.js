@@ -1,12 +1,14 @@
 var express = require('express');
 var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 var bodyParser = require('body-parser');
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(session({
   secret: 'qweqe123!@#Aqw@#$$8',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  store: new FileStore()
 }))
 
 app.get('/count', function(req, res) {
